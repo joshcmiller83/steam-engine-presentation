@@ -1,0 +1,663 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>The Steam Engine — A History</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;0,900;1,400&family=Courier+Prime:wght@400;700&family=Libre+Baskerville:ital@0;1&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --coal:      #1a1108;
+    --iron:      #2e2416;
+    --rust:      #8b3a0f;
+    --copper:    #b5651d;
+    --brass:     #9a6f00;
+    --ember:     #c94b0a;
+    --smoke:     #6b6155;
+    --mid:       #444038;
+    --bg:        #ffffff;
+    --bg-alt:    #f8f5f0;
+    --border:    #e2d8cc;
+  }
+
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  html { scroll-behavior: smooth; }
+
+  body {
+    background: var(--bg);
+    color: var(--coal);
+    font-family: 'Libre Baskerville', Georgia, serif;
+    overflow-x: hidden;
+  }
+
+  /* ── STEAM PARTICLES ── */
+  .steam-bg {
+    position: fixed; top: 0; left: 0;
+    width: 100%; height: 100%;
+    pointer-events: none; overflow: hidden; z-index: 0;
+  }
+  .particle {
+    position: absolute; bottom: -20px;
+    border-radius: 50%;
+    background: rgba(181,101,29,0.07);
+    animation: rise linear infinite;
+  }
+  @keyframes rise {
+    0%   { transform: translateY(0) scale(1); opacity: 0.07; }
+    100% { transform: translateY(-100vh) scale(5); opacity: 0; }
+  }
+
+  /* ── NAV ── */
+  nav {
+    position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 1rem 3rem;
+    background: rgba(255,255,255,0.94);
+    backdrop-filter: blur(6px);
+    border-bottom: 1px solid var(--border);
+  }
+  .nav-logo {
+    font-family: 'Playfair Display', serif;
+    font-size: 1rem; font-style: italic;
+    color: var(--copper); letter-spacing: 0.04em;
+  }
+  .nav-links { display: flex; gap: 2rem; list-style: none; }
+  .nav-links a {
+    font-family: 'Courier Prime', monospace;
+    font-size: 0.68rem; color: var(--smoke);
+    text-decoration: none; text-transform: uppercase; letter-spacing: 0.15em;
+    transition: color 0.2s;
+  }
+  .nav-links a:hover { color: var(--ember); }
+
+  /* ── HERO ── */
+  .hero {
+    position: relative; min-height: 100vh;
+    display: flex; flex-direction: column;
+    align-items: center; justify-content: center;
+    text-align: center; padding: 6rem 2rem 4rem;
+    overflow: hidden; background: var(--bg);
+  }
+  .gear {
+    position: absolute; border-radius: 50%;
+    border: 2px solid rgba(181,101,29,0.1);
+    animation: spin linear infinite;
+  }
+  .gear::before {
+    content: ''; position: absolute; inset: -6px;
+    border-radius: 50%; border: 1px dashed rgba(181,101,29,0.07);
+  }
+  @keyframes spin { to { transform: rotate(360deg); } }
+  .gear-1 { width: 320px; height: 320px; top: 5%;  right: -100px; animation-duration: 45s; }
+  .gear-2 { width: 200px; height: 200px; bottom: 10%; left: -60px; animation-duration: 30s; animation-direction: reverse; }
+  .gear-3 { width: 90px;  height: 90px;  top: 28%; left: 8%;    animation-duration: 18s; }
+
+  .ornament {
+    display: flex; align-items: center; gap: 1rem;
+    margin: 1.5rem 0;
+    color: var(--brass);
+    font-family: 'Courier Prime', monospace;
+    font-size: 0.72rem; letter-spacing: 0.3em; text-transform: uppercase;
+  }
+  .ornament::before, .ornament::after {
+    content: ''; flex: 1; height: 1px;
+    background: linear-gradient(90deg, transparent, var(--copper), transparent);
+    max-width: 100px;
+  }
+
+  .hero-eyebrow {
+    font-family: 'Courier Prime', monospace;
+    font-size: 0.68rem; letter-spacing: 0.35em; text-transform: uppercase;
+    color: var(--copper); margin-bottom: 1.5rem;
+    animation: fadeUp 1s ease both;
+  }
+  .hero-title {
+    font-family: 'Playfair Display', serif;
+    font-size: clamp(3.5rem, 9vw, 8rem);
+    font-weight: 900; line-height: 0.95; color: var(--coal);
+    animation: fadeUp 1s 0.2s ease both;
+  }
+  .hero-title em { color: var(--ember); font-style: italic; display: block; }
+  .hero-sub {
+    font-family: 'Libre Baskerville', serif; font-style: italic;
+    font-size: 1.05rem; color: var(--smoke);
+    max-width: 480px; line-height: 1.7; margin-top: 0.5rem;
+    animation: fadeUp 1s 0.4s ease both;
+  }
+  .hero-dates {
+    font-family: 'Courier Prime', monospace;
+    font-size: 0.78rem; color: var(--brass); letter-spacing: 0.2em;
+    animation: fadeUp 1s 0.6s ease both;
+  }
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(28px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+  .scroll-cue {
+    margin-top: 3rem; display: flex; flex-direction: column;
+    align-items: center; gap: 0.5rem;
+    animation: fadeUp 1s 0.8s ease both;
+  }
+  .scroll-cue span {
+    font-family: 'Courier Prime', monospace;
+    font-size: 0.58rem; text-transform: uppercase;
+    letter-spacing: 0.3em; color: var(--smoke);
+  }
+  .scroll-arrow {
+    width: 1px; height: 36px;
+    background: linear-gradient(180deg, var(--copper), transparent);
+    animation: pulse 2s ease-in-out infinite;
+  }
+  @keyframes pulse { 0%,100%{opacity:0.35;} 50%{opacity:1;} }
+
+  /* ── SECTIONS ── */
+  section { position: relative; z-index: 1; padding: 5.5rem 2rem; }
+  .section-inner { max-width: 860px; margin: 0 auto; }
+  .section-alt { background: var(--bg); }
+  .legacy-section {
+    background: var(--bg);
+    border-top: 1px solid var(--border);
+    border-bottom: 1px solid var(--border);
+  }
+
+  .section-number {
+    font-family: 'Playfair Display', serif;
+    font-size: 5.5rem; font-weight: 900;
+    color: rgba(181,101,29,0.09);
+    line-height: 1; margin-bottom: -1.2rem; display: block;
+  }
+  .section-tag {
+    font-family: 'Courier Prime', monospace;
+    font-size: 0.62rem; letter-spacing: 0.4em; text-transform: uppercase;
+    color: var(--copper); margin-bottom: 0.6rem; display: block;
+  }
+  h2 {
+    font-family: 'Playfair Display', serif;
+    font-size: clamp(2rem, 5vw, 3.2rem);
+    font-weight: 700; color: var(--coal);
+    line-height: 1.1; margin-bottom: 2rem;
+  }
+  h2 em { color: var(--ember); font-style: italic; }
+
+  .slide-text {
+    font-size: 1.05rem; line-height: 1.8;
+    color: var(--mid); margin-bottom: 1.5rem;
+  }
+
+  /* ── DIVIDERS ── */
+  .divider {
+    max-width: 860px; margin: 0 auto;
+    height: 1px;
+    background: linear-gradient(90deg, transparent, rgba(181,101,29,0.25), transparent);
+    position: relative;
+  }
+  .divider::after {
+    content: '⚙';
+    position: absolute; left: 50%; top: 50%;
+    transform: translate(-50%,-50%);
+    background: var(--bg); padding: 0 1rem;
+    color: var(--copper); font-size: 0.9rem;
+  }
+
+  /* ── CARDS ── */
+  .card-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 1.25rem; margin-top: 2rem;
+  }
+  .card {
+    background: var(--bg);
+    border: 1px solid var(--border);
+    border-top: 2px solid var(--copper);
+    padding: 1.5rem;
+    transition: box-shadow 0.25s, transform 0.25s;
+  }
+  .card:hover { box-shadow: 0 6px 24px rgba(181,101,29,0.1); transform: translateY(-3px); }
+  .card-icon { font-size: 1.4rem; margin-bottom: 0.6rem; display: block; }
+  .card h3 {
+    font-family: 'Playfair Display', serif;
+    font-size: 0.95rem; color: var(--copper);
+    margin-bottom: 0.35rem; font-weight: 700;
+  }
+  .card p { font-size: 0.88rem; color: var(--smoke); line-height: 1.55; margin: 0; }
+
+  /* ── STATS ── */
+  .stat-row {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+    gap: 1rem; margin: 2rem 0;
+  }
+  .stat {
+    text-align: center; padding: 1.25rem 0.75rem;
+    border: 1px solid var(--border); background: var(--bg);
+  }
+  .stat-num {
+    font-family: 'Playfair Display', serif;
+    font-size: 2.2rem; font-weight: 900;
+    color: var(--ember); line-height: 1; display: block;
+  }
+  .stat-label {
+    font-family: 'Courier Prime', monospace;
+    font-size: 0.6rem; text-transform: uppercase;
+    letter-spacing: 0.1em; color: var(--smoke);
+    display: block; margin-top: 0.35rem;
+  }
+
+  /* ── TIMELINE ── */
+  .timeline { position: relative; padding-left: 2.25rem; margin: 2rem 0; }
+  .timeline::before {
+    content: ''; position: absolute;
+    left: 0; top: 0; bottom: 0; width: 2px;
+    background: linear-gradient(180deg, var(--ember), var(--copper), transparent);
+  }
+  .timeline-item { position: relative; margin-bottom: 1.6rem; padding-left: 0.75rem; }
+  .timeline-item::before {
+    content: ''; position: absolute;
+    left: -2.25rem; top: 0.4rem;
+    width: 9px; height: 9px; border-radius: 50%;
+    background: var(--ember); border: 2px solid var(--bg);
+    box-shadow: 0 0 6px rgba(201,75,10,0.4);
+  }
+  .timeline-year {
+    font-family: 'Courier Prime', monospace;
+    font-size: 0.65rem; color: var(--brass);
+    letter-spacing: 0.18em; margin-bottom: 0.2rem; display: block;
+  }
+  .timeline-item p { font-size: 0.92rem; color: var(--mid); line-height: 1.6; margin: 0; }
+  .timeline-item strong { color: var(--coal); }
+
+  /* ── BLOCKQUOTE ── */
+  blockquote {
+    border-left: 3px solid var(--ember);
+    padding: 1rem 1.75rem; margin: 2rem 0;
+    background: rgba(181,101,29,0.04);
+    font-family: 'Playfair Display', serif;
+    font-style: italic; font-size: 1.1rem;
+    color: var(--coal); line-height: 1.6;
+  }
+  blockquote cite {
+    display: block; margin-top: 0.6rem;
+    font-family: 'Courier Prime', monospace;
+    font-style: normal; font-size: 0.65rem;
+    color: var(--copper); letter-spacing: 0.1em; text-transform: uppercase;
+  }
+
+  /* ── SPEAKER NOTES ── */
+  .notes-toggle {
+    display: inline-flex; align-items: center; gap: 0.5rem;
+    margin-top: 2.25rem;
+    font-family: 'Courier Prime', monospace;
+    font-size: 0.68rem; text-transform: uppercase;
+    letter-spacing: 0.18em; color: var(--copper);
+    background: none; border: 1px solid var(--border);
+    padding: 0.5rem 1rem; cursor: pointer;
+    transition: background 0.2s, color 0.2s;
+  }
+  .notes-toggle:hover { background: rgba(181,101,29,0.05); color: var(--ember); }
+  .notes-toggle .arrow { transition: transform 0.3s; display: inline-block; }
+  .notes-toggle.open .arrow { transform: rotate(180deg); }
+
+  .speaker-notes {
+    display: none;
+    margin-top: 1rem;
+    padding: 1.5rem 1.75rem;
+    background: #fffdf8;
+    border: 1px solid var(--border);
+    border-left: 3px solid var(--brass);
+  }
+  .speaker-notes.visible { display: block; }
+  .notes-label {
+    font-family: 'Courier Prime', monospace;
+    font-size: 0.6rem; text-transform: uppercase;
+    letter-spacing: 0.25em; color: var(--brass);
+    margin-bottom: 0.75rem; display: block;
+  }
+  .speaker-notes p {
+    font-size: 0.9rem; line-height: 1.8;
+    color: var(--smoke); margin-bottom: 0.9rem;
+  }
+  .speaker-notes p:last-child { margin-bottom: 0; }
+  .speaker-notes strong { color: var(--mid); }
+
+  /* ── FOOTER ── */
+  footer {
+    position: relative; z-index: 1;
+    padding: 2.5rem 2rem; text-align: center;
+    border-top: 1px solid var(--border); background: var(--bg);
+  }
+  footer p {
+    font-family: 'Courier Prime', monospace;
+    font-size: 0.68rem; color: var(--smoke);
+    letter-spacing: 0.1em; margin: 0;
+  }
+
+  /* ── SCROLL REVEAL ── */
+  .reveal { opacity: 0; transform: translateY(36px); transition: opacity 0.75s ease, transform 0.75s ease; }
+  .reveal.visible { opacity: 1; transform: translateY(0); }
+
+  @media (max-width: 640px) {
+    nav { padding: 0.9rem 1.25rem; }
+    .nav-links { display: none; }
+    section { padding: 3.5rem 1.25rem; }
+    .card-grid { grid-template-columns: 1fr; }
+  }
+</style>
+</head>
+<body>
+
+<div class="steam-bg" id="steamBg"></div>
+
+<nav>
+  <span class="nav-logo">The Steam Engine</span>
+  <ul class="nav-links">
+    <li><a href="#what">What</a></li>
+    <li><a href="#how">How</a></li>
+    <li><a href="#society">Society</a></li>
+    <li><a href="#commerce">Commerce</a></li>
+    <li><a href="#today">Today</a></li>
+  </ul>
+</nav>
+
+<!-- HERO -->
+<section class="hero">
+  <div class="gear gear-1"></div>
+  <div class="gear gear-2"></div>
+  <div class="gear gear-3"></div>
+
+  <p class="hero-eyebrow">A presentation on</p>
+  <h1 class="hero-title">The<br><em>Steam Engine</em></h1>
+  <div class="ornament">History &amp; Legacy</div>
+  <p class="hero-sub">From Newcomen's mine pump to the railways that conquered continents — the machine that made the modern world.</p>
+  <p class="hero-dates">c. 1698 — Present Day</p>
+  <div class="scroll-cue">
+    <span>Scroll to begin</span>
+    <div class="scroll-arrow"></div>
+  </div>
+</section>
+
+<div class="divider"></div>
+
+<!-- 01: WHAT -->
+<section id="what" class="reveal">
+  <div class="section-inner">
+    <span class="section-number">01</span>
+    <span class="section-tag">Definition &amp; Origins</span>
+    <h2>What is a <em>Steam Engine?</em></h2>
+
+    <p class="slide-text">A device that converts pressurised steam into mechanical work — boiling water to drive a piston or turbine. Three inventors built on each other's work across a century to perfect it.</p>
+
+    <div class="card-grid">
+      <div class="card">
+        <span class="card-icon">💧</span>
+        <h3>Savery's Engine, 1698</h3>
+        <p>First patented steam device. Used pressure and vacuum to lift water from flooded mines — no moving piston.</p>
+      </div>
+      <div class="card">
+        <span class="card-icon">🔩</span>
+        <h3>Newcomen's Engine, 1712</h3>
+        <p>Introduced the piston cylinder. Atmospheric pressure did the work. Revolutionary, but extremely inefficient.</p>
+      </div>
+      <div class="card">
+        <span class="card-icon">⚙️</span>
+        <h3>Watt's Engine, 1769+</h3>
+        <p>Separate condenser cut fuel use by 75%. Rotary motion made it adaptable to virtually any machine.</p>
+      </div>
+    </div>
+
+    <blockquote>
+      "Nothing is so fatal to the progress of the human mind as to suppose our views of science are ultimate."
+      <cite>— James Watt, Scottish Engineer (1736–1819)</cite>
+    </blockquote>
+
+    <button class="notes-toggle" onclick="toggleNotes(this)">
+      📋 Speaker Notes <span class="arrow">▾</span>
+    </button>
+    <div class="speaker-notes">
+      <span class="notes-label">Speaker Notes — Section 01</span>
+      <p>A steam engine is a <strong>heat engine</strong>: it transforms thermal energy from burning fuel into mechanical work. Water heated in a sealed boiler turns to steam, which occupies roughly 1,700 times more volume than the liquid water. That expansion creates immense pressure, which is directed at a piston or turbine to produce motion.</p>
+      <p><strong>Thomas Savery</strong> (1698) built the "Miner's Friend" — the first commercially useful steam device — to pump water from flooded mines. It had no piston and was severely limited by depth and pressure. <strong>Thomas Newcomen</strong> (1712) added a piston cylinder; atmospheric pressure pushing down on condensed steam inside the cylinder did the real work. It was wildly inefficient but a genuine mechanical breakthrough that powered hundreds of mines across Britain and Europe.</p>
+      <p><strong>James Watt</strong>, working from the 1760s in partnership with entrepreneur Matthew Boulton, made the decisive improvements: a separate condenser (so the main cylinder stayed hot), a double-acting piston (steam on both sides for continuous power), and a sun-and-planet gear to convert the linear stroke into rotary motion. This last innovation was transformative — suddenly one engine could drive a mill, a forge, a textile loom, or a ship.</p>
+    </div>
+  </div>
+</section>
+
+<div class="divider"></div>
+
+<!-- 02: HOW -->
+<section id="how" class="section-alt reveal">
+  <div class="section-inner">
+    <span class="section-number">02</span>
+    <span class="section-tag">Mechanics &amp; Thermodynamics</span>
+    <h2>How Do <em>They Work?</em></h2>
+
+    <p class="slide-text">Steam expands to ~1,700× its liquid volume. That pressure pushes a piston. A crank converts the back-and-forth motion into continuous rotation — the same principle as a car engine.</p>
+
+    <div class="timeline">
+      <div class="timeline-item">
+        <span class="timeline-year">Step 1 — Combustion</span>
+        <p>Fuel burns in a firebox, heating water inside a sealed, pressurised <strong>boiler</strong>.</p>
+      </div>
+      <div class="timeline-item">
+        <span class="timeline-year">Step 2 — Steam Generation</span>
+        <p>Water boils; <strong>pressure builds</strong>. A safety valve prevents catastrophic over-pressure.</p>
+      </div>
+      <div class="timeline-item">
+        <span class="timeline-year">Step 3 — Expansion &amp; Work</span>
+        <p>Steam enters the cylinder and <strong>pushes the piston</strong>. Watt's double-acting design works both sides for continuous power.</p>
+      </div>
+      <div class="timeline-item">
+        <span class="timeline-year">Step 4 — Rotation</span>
+        <p>A crank and <strong>flywheel</strong> convert the linear stroke into smooth, continuous rotary motion.</p>
+      </div>
+      <div class="timeline-item">
+        <span class="timeline-year">Step 5 — Exhaust</span>
+        <p>Spent steam exits. In condensing engines it is <strong>cooled back to water</strong>, dramatically improving efficiency.</p>
+      </div>
+    </div>
+
+    <button class="notes-toggle" onclick="toggleNotes(this)">
+      📋 Speaker Notes <span class="arrow">▾</span>
+    </button>
+    <div class="speaker-notes">
+      <span class="notes-label">Speaker Notes — Section 02</span>
+      <p>The core thermodynamic principle is simple: steam occupies roughly 1,700 times more volume than the liquid water that produced it. Confine that steam in a sealed vessel and you create enormous pressure. Direct the pressure at a piston inside a cylinder, and you get linear mechanical force. Attach that piston via a connecting rod to a crank and flywheel, and you convert the back-and-forth stroke into continuous rotary motion — the same fundamental mechanism used in today's internal combustion engines.</p>
+      <p>Newcomen's engine worked below atmospheric pressure — steam was condensed inside the cylinder, creating a partial vacuum, and atmospheric pressure pushed the piston down. Simple but hugely wasteful: the cylinder had to be alternately heated and cooled on every stroke. Watt's key insight was the <strong>separate condenser</strong>: keep the main cylinder hot at all times, condense steam in a separate always-cold vessel. This alone cut coal consumption by around 75%.</p>
+      <p>Later engineers, especially <strong>Richard Trevithick</strong>, moved to high-pressure steam — well above atmospheric pressure — which was far more powerful and compact, enabling the small, light engines needed for locomotives. Compound engines used steam twice in tandem cylinders to extract even more energy. By the late 19th century the <strong>steam turbine</strong> (Charles Parsons, 1884) spun a rotor directly at high speed — the same design that generates most of the world's electricity today.</p>
+    </div>
+  </div>
+</section>
+
+<div class="divider"></div>
+
+<!-- 03: SOCIETY -->
+<section id="society" class="reveal">
+  <div class="section-inner">
+    <span class="section-number">03</span>
+    <span class="section-tag">Society &amp; Culture</span>
+    <h2>Societal <em>Implications</em></h2>
+
+    <p class="slide-text">The steam engine powered the Industrial Revolution — a rupture so profound that historians measure civilisation in terms of before and after it.</p>
+
+    <div class="stat-row">
+      <div class="stat">
+        <span class="stat-num">10×</span>
+        <span class="stat-label">Productivity increase in textile mills</span>
+      </div>
+      <div class="stat">
+        <span class="stat-num">80%</span>
+        <span class="stat-label">Urban pop. growth, Britain 1800–1850</span>
+      </div>
+      <div class="stat">
+        <span class="stat-num">30k</span>
+        <span class="stat-label">Miles of UK railway by 1900</span>
+      </div>
+      <div class="stat">
+        <span class="stat-num">2×</span>
+        <span class="stat-label">Life expectancy rise across 1800s</span>
+      </div>
+    </div>
+
+    <div class="card-grid">
+      <div class="card">
+        <span class="card-icon">🏙️</span>
+        <h3>Urbanisation</h3>
+        <p>Britain went from 20% urban (1800) to 75%+ urban (1900), driven by steam factories pulling workers to cities.</p>
+      </div>
+      <div class="card">
+        <span class="card-icon">✊</span>
+        <h3>Labour Movements</h3>
+        <p>Factory conditions created trade unions, child labour laws, and the foundations of the modern welfare state.</p>
+      </div>
+      <div class="card">
+        <span class="card-icon">📰</span>
+        <h3>Mass Media</h3>
+        <p>Steam presses made newspapers affordable. The 1830s penny press created the first mass media audiences.</p>
+      </div>
+    </div>
+
+    <button class="notes-toggle" onclick="toggleNotes(this)">
+      📋 Speaker Notes <span class="arrow">▾</span>
+    </button>
+    <div class="speaker-notes">
+      <span class="notes-label">Speaker Notes — Section 03</span>
+      <p><strong>Urbanisation:</strong> Before steam, work was rural — agriculture, cottage industries, and water-powered mills tethered to rivers. The factory system, powered by steam, pulled millions to industrial cities like Manchester, Birmingham, Leeds, and Pittsburgh. The nature of work transformed almost overnight: seasonal farm rhythms replaced by regimented factory shifts timed by clocks and whistles. Britain went from roughly 20% urban in 1800 to over 75% by 1900.</p>
+      <p><strong>The rise of the working class:</strong> Factory labour created a new social class — the industrial proletariat. Conditions were often appalling: child labour, 14-hour days, dangerous machinery, no safety nets. This gave rise to organised labour movements, trade unions, and eventually socialist political thought. Friedrich Engels observed Manchester's steam-powered mills in the 1840s; his observations fed directly into the Communist Manifesto (1848). The welfare state, labour laws, and universal suffrage were all, eventually, responses to the social dislocations of steam.</p>
+      <p><strong>Communication and culture:</strong> Steam-powered printing presses made newspapers, books, and pamphlets cheap enough for ordinary people. Literacy rates climbed sharply. Steam railways collapsed distances — London to Edinburgh shrank from four days by coach to eight hours by train. Ideas, culture, and people circulated at a pace previously unimaginable, helping form national identities and modern public discourse. You can quote The Economist (1850s): <em>"The railways are the great civilisers of the age."</em></p>
+    </div>
+  </div>
+</section>
+
+<div class="divider"></div>
+
+<!-- 04: COMMERCE -->
+<section id="commerce" class="section-alt reveal">
+  <div class="section-inner">
+    <span class="section-number">04</span>
+    <span class="section-tag">Economy &amp; Commerce</span>
+    <h2>Commercial <em>Implications</em></h2>
+
+    <p class="slide-text">Steam freed factories from rivers, railways shrank continents, and steamships rewrote global trade routes — restructuring the entire world economy.</p>
+
+    <div class="card-grid">
+      <div class="card">
+        <span class="card-icon">🏭</span>
+        <h3>Factory Revolution</h3>
+        <p>Steam freed factories from rivers. British textile output grew 400% between 1770 and 1840.</p>
+      </div>
+      <div class="card">
+        <span class="card-icon">🚂</span>
+        <h3>The Railway Age</h3>
+        <p>Railways cut transport costs by 80–90%, creating national and then global markets almost overnight.</p>
+      </div>
+      <div class="card">
+        <span class="card-icon">🚢</span>
+        <h3>Steam Shipping</h3>
+        <p>Atlantic crossings fell from 6 weeks to under 2 weeks by the 1850s, turbocharging international trade.</p>
+      </div>
+      <div class="card">
+        <span class="card-icon">💰</span>
+        <h3>Capital Markets</h3>
+        <p>Funding railways required pooled capital at a new scale — spurring the modern stock exchange and limited liability companies.</p>
+      </div>
+    </div>
+
+    <button class="notes-toggle" onclick="toggleNotes(this)">
+      📋 Speaker Notes <span class="arrow">▾</span>
+    </button>
+    <div class="speaker-notes">
+      <span class="notes-label">Speaker Notes — Section 04</span>
+      <p><strong>The factory system:</strong> Before steam, manufacturing was either artisanal or water-wheel-powered, tying factories to riverbanks. Steam engines freed manufacturers to build anywhere coal could be delivered. The result: an explosion of industrial capacity — textile mills, iron foundries, pottery works — producing goods at a fraction of previous cost. British manufactured goods flooded global markets, creating both prosperity and the conditions for imperial exploitation of raw material suppliers.</p>
+      <p><strong>Railways:</strong> Richard Trevithick built the first steam locomotive in 1804. George Stephenson's Stockton & Darlington Railway (1825) and Liverpool & Manchester Railway (1830) proved commercial viability. Within decades, rail networks tied entire nations together. Agricultural produce from the American Midwest could reach eastern cities cheaply. The transcontinental railroad (1869) effectively unified the United States as a single economic zone. Transport costs fell 80–90%, collapsing the price of almost every commodity.</p>
+      <p><strong>Steam shipping:</strong> Steamships replaced sail on major trade routes from the 1830s. The Suez Canal (1869) was only commercially viable because steamships could navigate it reliably against wind. Voyage times shrank dramatically, insurance costs fell, and trade volumes exploded. Britain became the world's dominant trading and financial power largely because it had steam first.</p>
+      <p><strong>Capital markets:</strong> Building railways required more capital than any previous private enterprise. This drove financial innovation: the limited liability company (1855 in the UK), the modern stock exchange, and bond markets all developed substantially to fund steam-age infrastructure. The template for raising and deploying capital that emerged then still shapes global finance today.</p>
+    </div>
+  </div>
+</section>
+
+<div class="divider"></div>
+
+<!-- 05: TODAY -->
+<section id="today" class="legacy-section reveal">
+  <div class="section-inner">
+    <span class="section-number">05</span>
+    <span class="section-tag">The Present &amp; Future</span>
+    <h2>Implications <em>For Today</em></h2>
+
+    <p class="slide-text">The steam engine is not a relic. Steam turbines still generate most of the world's electricity. Its fossil-fuel legacy is driving the climate crisis. And it gave us the blueprint for every technological disruption since.</p>
+
+    <div class="card-grid">
+      <div class="card">
+        <span class="card-icon">🌍</span>
+        <h3>Climate Change</h3>
+        <p>Steam-age coal burning started the CO₂ accumulation we now grapple with. The energy transition is humanity reckoning with Watt's invention.</p>
+      </div>
+      <div class="card">
+        <span class="card-icon">⚡</span>
+        <h3>Modern Power Generation</h3>
+        <p>80%+ of global electricity still comes from steam turbines — in coal, gas, nuclear, and solar thermal plants.</p>
+      </div>
+      <div class="card">
+        <span class="card-icon">🌐</span>
+        <h3>Global Inequality</h3>
+        <p>Who had steam first largely determined who accumulated wealth. Those structural gaps between nations persist today.</p>
+      </div>
+      <div class="card">
+        <span class="card-icon">🤖</span>
+        <h3>Disruption Template</h3>
+        <p>Electricity, cars, the internet, AI — each follows the steam engine's pattern: a general-purpose technology that reshapes society faster than institutions can adapt.</p>
+      </div>
+    </div>
+
+    <blockquote>
+      "We are still living in the first act of the consequences of the steam engine."
+      <cite>— After Robert Gordon, economic historian</cite>
+    </blockquote>
+
+    <button class="notes-toggle" onclick="toggleNotes(this)">
+      📋 Speaker Notes <span class="arrow">▾</span>
+    </button>
+    <div class="speaker-notes">
+      <span class="notes-label">Speaker Notes — Section 05</span>
+      <p><strong>Steam is still here:</strong> The steam turbine — invented by Charles Parsons in 1884, a direct descendant of Watt's engine — is the primary mechanism of 21st-century electricity generation. Nuclear power plants, coal and gas stations, and concentrated solar thermal plants all boil water into steam to spin a turbine. When you flip a light switch, odds are very high that steam did the work.</p>
+      <p><strong>Climate change:</strong> The steam engine inaugurated humanity's dependency on fossil fuels. The coal burned to power the Industrial Revolution released CO₂ sequestered for millions of years. Climate scientists date the onset of significant human-caused atmospheric warming to approximately 1850 — the height of the steam age. The global energy transition underway today — solar, wind, batteries — is our effort to complete the productivity revolution steam began, while reversing its unintended planetary legacy.</p>
+      <p><strong>Global inequality:</strong> The patterns of development the steam engine created — industrialised nations accumulating capital; less-industrialised regions supplying raw materials — remain defining features of the global economy. The wealth gap between formerly industrial powers and the developing world was shaped significantly by who had access to steam technology first and who did not. This dynamic is called the "Great Divergence" by economic historians.</p>
+      <p><strong>The disruption template:</strong> Every major technological revolution since steam has followed the same pattern: a general-purpose technology begins in one sector, diffuses across the whole economy, destroys old industries while creating new ones, and reshapes society faster than laws and institutions can adapt. Electrification, the automobile, the internet, and now artificial intelligence all fit this template. Understanding the steam age is arguably the best preparation for understanding the AI age.</p>
+    </div>
+  </div>
+</section>
+
+<footer>
+  <div class="ornament" style="max-width:380px; margin: 0 auto 1.25rem;">End of Presentation</div>
+  <p>The History of the Steam Engine &nbsp;·&nbsp; c. 1698 – Present &nbsp;·&nbsp; A 5–10 Minute Lecture</p>
+</footer>
+
+<script>
+  // Steam particles
+  const bg = document.getElementById('steamBg');
+  for (let i = 0; i < 22; i++) {
+    const p = document.createElement('div');
+    p.className = 'particle';
+    p.style.left = Math.random() * 100 + '%';
+    p.style.animationDuration = (12 + Math.random() * 22) + 's';
+    p.style.animationDelay   = (Math.random() * 20) + 's';
+    const sz = (5 + Math.random() * 9) + 'px';
+    p.style.width = p.style.height = sz;
+    bg.appendChild(p);
+  }
+
+  // Scroll reveal
+  const observer = new IntersectionObserver(entries => {
+    entries.forEach(e => { if (e.isIntersecting) e.target.classList.add('visible'); });
+  }, { threshold: 0.07 });
+  document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
+
+  // Speaker notes toggle
+  function toggleNotes(btn) {
+    const notes = btn.nextElementSibling;
+    const open  = notes.classList.toggle('visible');
+    btn.classList.toggle('open', open);
+  }
+</script>
+</body>
+</html>
